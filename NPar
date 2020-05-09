@@ -1,0 +1,19 @@
+/**
+ * La classe NPar è una classe figlia di NBytes. In particolare si sfrutta la divisione a partire dal numero di bytes 
+ * calcolando la dimensione numero a partire dal numero di parti: per dividere il file in n parti, ogni parte avrà dimensione pari alla
+ * divisione intera fra dimensione totale e n. Potrebbe esserci un resto dato dal modulo tra la dimensione totale e n. 
+ */
+package logic;
+
+import java.io.File;
+
+public class NPar extends NBytes implements Runnable{
+	
+	public NPar(File f, int n){
+		super(f, ((int)f.length())/n);
+	}
+	
+	public void run(){
+		super.run();
+	}
+}
