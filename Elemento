@@ -1,0 +1,55 @@
+package logic;
+import java.io.File;
+
+public class Elemento {
+	private File file;
+	private String operazione;
+	private int info;
+	private char extra;
+	
+	public Elemento(){
+		file = null;
+		operazione = null;
+		info = 0;
+		extra = 'd';
+	}
+	
+	public Elemento(File f, String op, int inf, char ex){
+		file = f;
+		operazione = op;
+		info = inf;
+		extra = ex;
+	}
+	
+	public void setFile(File f){
+		file = f;
+	}
+	
+	public void setOp(String s){
+		operazione = s;
+	}
+	
+	public void setInfo(int n){
+		info = n;
+	}
+	
+	public void setExtra(char ex){
+		extra = ex;
+	}
+	
+	public File getFile(){
+		return file;
+	}
+	
+	public String getOp(){
+		return operazione;
+	}
+	
+	public int getInfo(){
+		return info;
+	}
+	
+	public char getExtra(){
+		return extra;
+	}
+}
