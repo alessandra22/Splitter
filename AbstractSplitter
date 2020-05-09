@@ -1,0 +1,38 @@
+package logic;
+
+import java.io.File;
+
+public abstract class AbstractSplitter implements Runnable{
+	protected String path = "C:/Users/Lenovo/Desktop/Tutto/Università/Secondo Anno 19-20/Secondo Semestre/Calcolo Numerico/Appunti/PROVE/";
+	protected String primo_carattere;
+	protected File file;
+	protected String nome_file;
+
+	protected int dim_parti;
+	protected int DIM_BUFFER = 4*1024;
+	
+	protected int dim, n_parti, dim_resto;
+	
+	protected int n_buffer_parti, dim_buffer_parti;
+	protected int n_buffer_resto, dim_buffer_resto;
+	
+	protected int inc;
+	
+	public AbstractSplitter(File f){
+		file = f;
+		nome_file = f.getName();
+		dim = (int)f.length();
+	}
+
+	public void setInc(int n){
+		inc = n;
+	}
+	
+	public int getInc(){
+		return inc;
+	}
+	
+	void setDim(){
+		
+	}
+}
