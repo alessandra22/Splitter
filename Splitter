@@ -28,9 +28,9 @@ public class Splitter {
 	
 	/**
 	 * La funzione start() scorre tramite un ciclo for la coda e, per ogni elemento, viene inizializzata la variabile elem,
-	 * (inizialmente di tipo NBytes, classe padre di tutte le classi di divisione) con la classe di divisione specificata nel campo
-	 * operazione e l'estensione richiesta nel campo extra. 
-	 * La funzione chiama alla fine del for il metodo split(), comune a tutte le classi ma specificato per ognuna, così che
+	 * (inizialmente di tipo AbstractSplitter, classe padre di tutte le classi di divisione) con la classe di divisione specificata 
+	 * nel campo operazione e l'estensione richiesta nel campo extra. 
+	 * La funzione chiama alla fine del for il metodo run(), comune a tutte le classi ma specificato per ognuna, così che
 	 * con la stessa funzione vengono applicate le giuste modifiche a seconda dell'operazione scelta: questo è possibile grazie
 	 * alla caratteristica di Java che è il polimorfismo.
 	 * @throws IOException 
