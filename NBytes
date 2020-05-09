@@ -1,0 +1,88 @@
+/**
+ * La classe NBytes è la classe padre da cui derivano tutte le classi di divisione all'interno del programma.
+ * Essa permette di dividere un file dato il numero di bytes per parte.
+ */
+
+package logic;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class NBytes extends AbstractSplitter implements Runnable{
+	File[] fileSplitted;
+	
+	public NBytes(File f, int n){
+		super(f);
+		dim_parti = n;
+		setDim();
+		
+		if(dim_resto == 0)
+			fileSplitted = new File[n_parti];
+		else
+			fileSplitted = new File[n_parti + 1];
+	}
+	
+	public void setDim(){
+		n_parti = dim/dim_parti;	//numero di file che saranno creati
+		dim_resto = dim%dim_parti;	//dimensione di un eventuale file resto
+		
+		n_buffer_parti = dim_parti/DIM_BUFFER;	//numero di buffer pieni per una singola parte
+		dim_buffer_parti = dim_parti%DIM_BUFFER;//dimensione di un eventuale buffer di resto per ogni parte
+		
+		n_buffer_resto = dim_resto/DIM_BUFFER;	//numero di buffer pieni per il file resto
+		dim_buffer_resto = dim_resto%DIM_BUFFER;//dimensione di un eventuale buffer di resto per il file resto
+				
+		primo_carattere = "d"; //d per il primo file (che servirà per il merge) e un numero appartenente a [1,n_parti]
+	}
+
+	@Override
+	public void run() {
+		FileInputStream fis = null;
+		FileOutputStream fos = null;
+		byte[] buffer;   
+		
+		try {
+			fis = new FileInputStream(file);
+			
+			for (int i=0 ; i<n_parti; i++){
+				File f = new File(path + primo_carattere + nome_file);
+				buffer = new byte[DIM_BUFFER];
+				fos = new FileOutputStream(path + primo_carattere + nome_file);
+				
+				for (int j=0 ; j<n_buffer_parti+1; j++){
+					if (j==n_buffer_parti)
+						buffer = new byte[dim_buffer_parti];
+					int letto = fis.read(buffer, 0, buffer.length);
+					System.out.println("Ho letto " + letto + " bytes per " + f.getName());
+					fos.write(buffer, 0, buffer.length);
+				}
+				fileSplitted[i] = f;
+				fos.close();
+				primo_carattere = i+1 + "";
+			}
+			
+			if (dim_resto != 0){
+				File f = new File(path + primo_carattere + nome_file);
+				buffer = new byte[DIM_BUFFER];
+				fos = new FileOutputStream(path + primo_carattere + nome_file);
+				
+				for (int i=0 ; i<n_buffer_resto+1; i++){
+					if (i==n_buffer_resto)
+						buffer = new byte[dim_buffer_resto];
+					int letto = fis.read(buffer, 0, buffer.length);
+					System.out.println("Ho letto " + letto + " bytes per " + f.getName());
+					fos.write(buffer, 0, buffer.length);
+				}
+				fileSplitted[n_parti] = f;
+			}
+			
+		fis.close();
+		fos.flush();
+		fos.close();
+		} catch (IOException e) {
+				e.printStackTrace();
+		}
+	}
+}
