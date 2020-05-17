@@ -10,8 +10,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class NBytes extends AbstractSplitter implements Runnable{
+public class NBytes extends AbstractSplitter{
 	File[] fileSplitted;
+	Boolean zip;
 	
 	public NBytes(File f, int n){
 		super(f);
@@ -22,6 +23,7 @@ public class NBytes extends AbstractSplitter implements Runnable{
 			fileSplitted = new File[n_parti];
 		else
 			fileSplitted = new File[n_parti + 1];
+		zip = false;
 	}
 	
 	public void setDim(){
@@ -83,6 +85,10 @@ public class NBytes extends AbstractSplitter implements Runnable{
 		fos.close();
 		} catch (IOException e) {
 				e.printStackTrace();
+		}
+		if(!zip){
+			System.out.println("File " + nome_file + " finito!");
+			super.avanz.incrementa();
 		}
 	}
 }
