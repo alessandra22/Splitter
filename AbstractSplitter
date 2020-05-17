@@ -2,7 +2,7 @@ package logic;
 
 import java.io.File;
 
-public abstract class AbstractSplitter implements Runnable{
+public abstract class AbstractSplitter implements Runnable {
 	protected String path = "C:/Users/Lenovo/Desktop/Tutto/Università/Secondo Anno 19-20/Secondo Semestre/Calcolo Numerico/Appunti/PROVE/";
 	protected String primo_carattere;
 	protected File file;
@@ -17,6 +17,7 @@ public abstract class AbstractSplitter implements Runnable{
 	protected int n_buffer_resto, dim_buffer_resto;
 	
 	protected int inc;
+	protected Avanzamento avanz;
 	
 	public AbstractSplitter(File f){
 		file = f;
@@ -34,5 +35,9 @@ public abstract class AbstractSplitter implements Runnable{
 	
 	void setDim(){
 		
+	}
+	
+	public void setAvanz(Avanzamento a){
+		avanz = a;
 	}
 }
