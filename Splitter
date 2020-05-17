@@ -13,33 +13,34 @@ public class Splitter {
 	private String operazione;
 	private int numero;
 	private char ext;
+	private Avanzamento avanzamento;
 	
 	private Coda coda;
-	protected AbstractSplitter[] jobs;
+	protected Thread[] jobs;
 	
 	/**
 	 * Il costruttore inizializza la coda (privata) con quella passata per argomento
 	 * @param c, coda creata tramite GUI. 
 	 */
 	
-	public Splitter(Coda c){
+	public Splitter(Coda c, Avanzamento a){
 		coda = c;	
+		avanzamento = a;
 	}
 	
 	/**
 	 * La funzione start() scorre tramite un ciclo for la coda e, per ogni elemento, viene inizializzata la variabile elem,
-	 * (inizialmente di tipo AbstractSplitter, classe padre di tutte le classi di divisione) con la classe di divisione specificata 
-	 * nel campo operazione e l'estensione richiesta nel campo extra. 
-	 * La funzione chiama alla fine del for il metodo run(), comune a tutte le classi ma specificato per ognuna, così che
+	 * (inizialmente di tipo NBytes, classe padre di tutte le classi di divisione) con la classe di divisione specificata nel campo
+	 * operazione e l'estensione richiesta nel campo extra. 
+	 * La funzione chiama alla fine del for il metodo split(), comune a tutte le classi ma specificato per ognuna, così che
 	 * con la stessa funzione vengono applicate le giuste modifiche a seconda dell'operazione scelta: questo è possibile grazie
 	 * alla caratteristica di Java che è il polimorfismo.
 	 * @throws IOException 
 	 */
 	
 	public void start(){
-		jobs = new AbstractSplitter[coda.getSize()];
+		jobs = new Thread[coda.getSize()];
 		for (int i=0 ; i<coda.getSize() ; i++){
-			
 			operazione = coda.getOpIndex(i);
 			numero = coda.getInfoIndex(i);
 			ext = coda.getExtraIndex(i);
@@ -57,8 +58,9 @@ public class Splitter {
 						elem = new Zip(file, numero);
 						break;
 				}
-			jobs[i] = elem;
-			jobs[i].run();
+			elem.setAvanz(avanzamento);
+			jobs[i] = new Thread(elem);
+			jobs[i].start();
 		}
 	}
 }
