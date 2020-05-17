@@ -1,0 +1,22 @@
+package logic;
+
+import javax.swing.JProgressBar;
+
+public class Avanzamento extends JProgressBar{
+	private int nElementi;
+	
+	public Avanzamento(int n){
+		nElementi = n;
+		setInizio();
+	}
+	
+	public void setInizio(){
+		setValue(0);
+		setMaximum(nElementi);
+	}
+	
+	public void incrementa(){
+		int v = getValue();
+		setValue(v+1);
+	}
+}
