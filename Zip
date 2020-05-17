@@ -19,6 +19,7 @@ public class Zip extends NBytes{
 	public Zip(File f, int n){
 		super(f, n);
 		primo_carattere = "z";
+		zip = true;
 	}
 	
 	public void run(){
@@ -51,6 +52,8 @@ public class Zip extends NBytes{
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+		System.out.println("File " + nome_file + " finito!");
+		super.avanz.incrementa();
 	}
 	
 	public File unzip(File f){
