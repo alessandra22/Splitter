@@ -1,0 +1,107 @@
+package logic;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Vector;
+
+public class Merger extends Zip{
+	File primoFile;
+	String parte1, parte2;
+	String nomeFile;
+	boolean zip;
+	Vector <File> filesDaUnire;
+	
+	public Merger(File f){
+		super(f,1);
+		primoFile = f;
+		
+		String s = primoFile.getAbsolutePath();
+		int pos = s.lastIndexOf(primoFile.getName());
+		parte1 = s.substring(0, pos);
+		parte2 = s.substring(pos+1);
+		nomeFile = parte1+parte2;
+		
+		zip = false;
+		filesDaUnire = new Vector<File>();
+		filesDaUnire.add(primoFile);
+	}
+	
+	public void cercaFile(){		
+		if (primoFile.getName().startsWith("z")){
+			zip = true;
+		}
+		for (int i=1 ; ; i++){
+			String nomeFileDaTrovare = parte1 + i + parte2;
+			File f = new File(nomeFileDaTrovare);
+			
+			if (f.exists())
+				filesDaUnire.add(f);
+			else
+				break;
+		}
+	}
+	
+	public void leggiFile(){
+		for (int i=0 ; i<filesDaUnire.size() ; i++){
+			System.out.println("Merge" + i + " - " + filesDaUnire.get(i).getName());
+		}
+	}
+
+	@Override
+	public void run() {
+		cercaFile();
+		if (zip){
+			int pos = parte2.lastIndexOf(".zip");
+			parte2 = parte2.substring(0, pos);
+			
+			for(int i=0 ; i<filesDaUnire.size(); i++){
+				filesDaUnire.add(i, unzip(filesDaUnire.get(i)));
+				filesDaUnire.remove(i+1);
+			}
+			nomeFile = parte1 + parte2;
+		}
+		File fileFinale = new File(nomeFile);
+		
+		try {
+			FileOutputStream fos = new FileOutputStream(fileFinale);
+			FileInputStream fis = null;
+			String primoC; 
+				if (zip)
+					primoC = "z";
+				else
+					primoC = "d";
+				
+			for (int i=0 ; i<filesDaUnire.size() ;i++){
+				byte[] buffer = new byte[4096];
+				fis = new FileInputStream(parte1 + primoC + parte2);
+				
+				int length;
+				while((length = fis.read(buffer)) >= 0){
+					fos.write(buffer, 0, length);
+				}
+				if(zip){
+					File f = new File(parte1 + primoC + parte2);
+					f.delete();
+				}
+				primoC = (i+1)+"";
+				fis.close();
+			}
+			fos.close();
+			
+			if(zip){
+				primoC = "z";
+				for(int i=0 ; i<filesDaUnire.size() ; i++){
+					File f = new File(parte1 + primoC + parte2);
+					f.delete();
+					primoC = (i+1) + "";
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		filesDaUnire.removeAllElements();
+		leggiFile();
+	}
+}
