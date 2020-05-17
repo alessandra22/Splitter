@@ -19,7 +19,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JRadioButton;
-import javax.swing.JProgressBar;
+//import javax.swing.JProgressBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
@@ -38,7 +38,7 @@ public class MyPanel extends JPanel implements ActionListener{
 	private JButton b, b1, b2, b3, b4;
 	private JRadioButton rb1, rb2, rb3, rb4;
 	private ButtonGroup bg1, bg2;
-	private JProgressBar progressBarTot;
+	private Avanzamento progressBarTot;
 	private Coda c;
 	private Vector<String> colNames;
 	private Vector<Vector<Object>> data;
@@ -65,7 +65,6 @@ public class MyPanel extends JPanel implements ActionListener{
 		setButtons();
 		data = new Vector<Vector<Object>>();
 		setTable();	
-		setProgressBar();
 		setActions();
 		c = new Coda();
 	}
@@ -177,27 +176,12 @@ public class MyPanel extends JPanel implements ActionListener{
 	}
 	
 	private void setProgressBar(){		
-		progressBarTot = new JProgressBar();
+		progressBarTot = new Avanzamento(c.getSize());
 		progressBarTot.setBounds(470, 120, 250, 25);
 		add(progressBarTot);
+		progressBarTot.setVisible(true);
 	}
 	
-/*		private void addProgressBarTot(){
-		int v = progressBarTot.getValue();
-		progressBarTot.setValue(v+1);
-	}
-	
-	private void setInizio(int n){
-		numeroFile.setText("Inizio la divisione, 0/" + n);
-		progressBarTot.setMaximum(n);
-	}
-	
-	private void avanzamento(String s, int n, int m){
-		nomeFileInCorso.setText(s);
-		addProgressBarTot();
-		numeroFile.setText("Divisione file " + n + "/" + m);
-	}
-*/
 	/**
 	 * La funzione setVisibleText serve ad abilitare le TextArea delle funzioni selezionate e cancella il testo di quella 
 	 * non attiva
@@ -237,13 +221,14 @@ public class MyPanel extends JPanel implements ActionListener{
 	  private void fileChooser(){
 	    fc = new JFileChooser(path);
 	    fc.setMultiSelectionEnabled(true);
+	   
 	    int n = fc.showOpenDialog(MyPanel.this); 
-	    if (n==fc.APPROVE_OPTION){              
-	      fs = fc.getSelectedFiles();
-	      c.addFiles(fs);
-	    }
-	    else 
-	      fs = null;
+	   	if (n==fc.APPROVE_OPTION){              
+	   		fs = fc.getSelectedFiles();
+	   		c.addFiles(fs);
+	   	}
+	   	else 
+	   		fs = null;
 	    getFileNames();
 	  }
 	
@@ -314,6 +299,7 @@ public class MyPanel extends JPanel implements ActionListener{
 	 *  Il carattere extra è modificato in 'z'
 	 */
 	
+	@SuppressWarnings("static-access")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		switch(e.getActionCommand()){
@@ -332,6 +318,7 @@ public class MyPanel extends JPanel implements ActionListener{
 				MyModel.fireTableDataChanged();
 				table.revalidate();
 				break;
+				
 			case "pb2": 
 				int i = table.getSelectedRow();
 				if(i==-1) 
@@ -346,17 +333,29 @@ public class MyPanel extends JPanel implements ActionListener{
 					table.revalidate();
 				}
 				break;
-			case "pb3": 
-				JOptionPane.showInputDialog("Ecco.. non possiamo riunire ancora ma grazie per aver considerato la nostra offerta!");
-				break;
-			case "pb4": 
-				Splitter splitter = new Splitter(c);
-				splitter.start();
 				
-				data = null;
-				c = null;
-				MyModel.fireTableDataChanged();
-				table.revalidate();
+			case "pb3": 
+				fc = new JFileChooser(path);
+				int fileSelezionato = fc.showOpenDialog(MyPanel.this); 
+			    try{
+			    	if (fileSelezionato==fc.APPROVE_OPTION){              
+			    		Merger m = new Merger (fc.getSelectedFile());
+			    		m.run();
+			    	}
+			    } catch (NullPointerException npe){
+			    	npe.printStackTrace();
+			    }
+				break;
+				
+				
+			case "pb4": 
+				if(c!=null){
+					setProgressBar();
+					Splitter splitter = new Splitter(c, progressBarTot);
+					splitter.start();
+				}
+				else
+					JOptionPane.showInputDialog("CODA VUOTA");
 				break;
 				
 			case "pok":
@@ -394,14 +393,17 @@ public class MyPanel extends JPanel implements ActionListener{
 				setVisibleText(true,false,true,false);
 				setCZEnabled(false);
 				break;
+				
 			case "prb2":
 				setVisibleText(false,true,false,true);
 				setCZEnabled(true);
 				s = "#bytes";
 				break;
+				
 			case "prb3":
 				extra = 'c';
 				break;
+				
 			case "prb4":
 				extra = 'z';
 				break;
