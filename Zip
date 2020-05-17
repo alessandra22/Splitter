@@ -10,9 +10,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class Zip extends NBytes implements Runnable{
+public class Zip extends NBytes{
+	File[] filesDaComprimere;
 	
 	public Zip(File f, int n){
 		super(f, n);
@@ -21,15 +23,11 @@ public class Zip extends NBytes implements Runnable{
 	
 	public void run(){
 		super.run();
-		comprimi();
-	}
-	
-	public void comprimi(){
-		File[] filesDaComprimere = fileSplitted;
+		filesDaComprimere = fileSplitted;
 		
 		try {
 			for (int i=0 ; i<filesDaComprimere.length ; i++){	
-				File fileDaComprimere = fileSplitted[i];
+				File fileDaComprimere = filesDaComprimere[i];
 				
 				String s = fileDaComprimere.getName();
 				FileOutputStream fos = new FileOutputStream(path + s + ".zip");
@@ -53,5 +51,34 @@ public class Zip extends NBytes implements Runnable{
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+	}
+	
+	public File unzip(File f){
+		String vecchioNome = f.getName();
+		int pos = vecchioNome.lastIndexOf(".zip");
+		String nuovoNome = vecchioNome.substring(0, pos);
+		
+		File fileEstratto = new File(nuovoNome);
+		byte[] buffer = new byte[4096];
+		try{
+			FileOutputStream fos = new FileOutputStream(path + fileEstratto.getName());
+			FileInputStream fis = new FileInputStream(path + vecchioNome);
+			ZipInputStream zis = new ZipInputStream(fis);
+			ZipEntry ze = zis.getNextEntry();
+			
+			if(ze!=null){
+				int len;
+				while ((len = zis.read(buffer)) > 0) {
+				   	fos.write(buffer, 0, len);
+				}
+			}
+			fos.close();
+			zis.close();
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return fileEstratto;
 	}
 }
