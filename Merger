@@ -1,17 +1,28 @@
 package logic;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
+/**
+ * Classe che riunisce i file divisi. Estende la classe Zip, così da servirsi della funzione unzip.
+ */
 public class Merger extends Zip{
 	File primoFile;
 	String parte1, parte2;
 	String nomeFile;
 	boolean zip;
 	Vector <File> filesDaUnire;
+	
+	/**
+	 * Il costruttore deve utilizzare prima quello della classe padre, inizializza poi il file primoFile a f.
+	 * <p>Inizializza poi una stringa s col nome del percorso assoluto del file; questa viene poi divisa tra path e nome del file, 
+	 * così da non avere più il primoCarattere. L'unione tra le due stringhe trovate darà infatti il nome originale del file.
+	 * 
+	 * <p>Inizialmente lo zip è disattivato e il primo file viene unito al Vector di files da unire.
+	 * @param f primo file da unire.
+	 */
 	
 	public Merger(File f){
 		super(f,1);
@@ -28,6 +39,14 @@ public class Merger extends Zip{
 		filesDaUnire.add(primoFile);
 	}
 	
+	/**
+	 * La funzione cercaFile inizializza zip grazie al primo carattere del nome di primoFile.
+	 * 
+	 * <p>Ciclicamente poi cerca un file formato dalle due stringhe ricavate, con al posto del primo carattere precedentemente 
+	 * cancellato, i numeri a partire da 1. Se il file esiste, viene aggiunto al Vector di file da unire.
+	 * <p>Il ciclo si ferma quando il file non viene trovato.
+	 */
+	
 	public void cercaFile(){		
 		if (primoFile.getName().startsWith("z")){
 			zip = true;
@@ -42,13 +61,16 @@ public class Merger extends Zip{
 				break;
 		}
 	}
-	
-	public void leggiFile(){
-		for (int i=0 ; i<filesDaUnire.size() ; i++){
-			System.out.println("Merge" + i + " - " + filesDaUnire.get(i).getName());
-		}
-	}
 
+	/**
+	 * Se il primoFile era compresso, il processo di unione parte dalla estrazione dei file originari. Questi sostituiscono poi 
+	 * i file compressi nel Vector di file da unire. Viene poi tolta l'estensione .zip dal nome del file finale.
+	 * 
+	 * <p>Poi vengono uniti tutti i file nel formato originale e, se i file erano compressi e sono stati estratti, i file estratti
+	 * vengono eliminati. 
+	 * Il Vector viene poi svuotato.
+	 */
+	
 	@Override
 	public void run() {
 		cercaFile();
@@ -81,10 +103,6 @@ public class Merger extends Zip{
 				while((length = fis.read(buffer)) >= 0){
 					fos.write(buffer, 0, length);
 				}
-				if(zip){
-					File f = new File(parte1 + primoC + parte2);
-					f.delete();
-				}
 				primoC = (i+1)+"";
 				fis.close();
 			}
@@ -102,6 +120,5 @@ public class Merger extends Zip{
 			e.printStackTrace();
 		}
 		filesDaUnire.removeAllElements();
-		leggiFile();
 	}
 }
