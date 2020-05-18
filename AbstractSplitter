@@ -2,6 +2,9 @@ package logic;
 
 import java.io.File;
 
+/**
+ * Classe astratta padre di tutti i metodi di divisione.
+ */
 public abstract class AbstractSplitter implements Runnable {
 	protected String path = "C:/Users/Lenovo/Desktop/Tutto/Università/Secondo Anno 19-20/Secondo Semestre/Calcolo Numerico/Appunti/PROVE/";
 	protected String primo_carattere;
@@ -16,26 +19,39 @@ public abstract class AbstractSplitter implements Runnable {
 	protected int n_buffer_parti, dim_buffer_parti;
 	protected int n_buffer_resto, dim_buffer_resto;
 	
-	protected int inc;
 	protected Avanzamento avanz;
 	
+	/**
+	 * Il costruttore aggiorna i campi file e ne deriva il nome (nome_file) e prende la dimensione in byte (dim).
+	 * @param f file da dividere.
+	 */
 	public AbstractSplitter(File f){
 		file = f;
 		nome_file = f.getName();
 		dim = (int)f.length();
 	}
 
-	public void setInc(int n){
-		inc = n;
-	}
-	
-	public int getInc(){
-		return inc;
-	}
+	/**
+	 * La funzione setDim calcolerà tutte le dimensioni utili alla divisione:
+	 * 
+	 * <p>n_parti = parti del file esattamente di dimensione n passata
+	 * <p>dim_resto = dimensione del file che contiene il resto della divisione
+	 *
+	 * <p>n_buffer_parti = numero di buffer pieni necessari per le parti intere
+	 * <p>dim_buffer_parti = dimensione del buffer resto per le parti intere
+	 * 
+	 * <p>n_buffer_resto = numero di buffer pieni necessari per la parte resto
+	 * <p>dim_buffer_resto = dimensione del buffer resto per la parte resto
+	 */
 	
 	void setDim(){
 		
 	}
+	
+	/**
+	 * La funzione setAvanz passa alle classi la JProgressBar per l'avanzamento globale
+	 * @param a avanzamento
+	 */
 	
 	public void setAvanz(Avanzamento a){
 		avanz = a;
