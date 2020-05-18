@@ -1,19 +1,26 @@
-/**
- * La classe NBytes è la classe padre da cui derivano tutte le classi di divisione all'interno del programma.
- * Essa permette di dividere un file dato il numero di bytes per parte.
- */
-
 package logic;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * La classe NBytes è la classe da cui deriva la classe Zip.
+ * Essa permette di dividere un file dato il numero di bytes per parte.
+ */
 public class NBytes extends AbstractSplitter{
 	File[] fileSplitted;
 	Boolean zip;
 	
+	/**
+	 * Il costruttore richiama il costruttore padre, ossia di AbstractSplitter.
+	 * <p>Inizializza poi l'array di file che saranno i risultati della divisione del file f, utile per la funzione zip.
+	 * <p>Imposta il booleano zip a false, poiché i file risultati non dovranno essere compressi, quindi una volta finita la 
+	 * divisione standard, è possibile incrementare la JProgressBar. 
+	 * 
+	 * @param f file da dividere.
+	 * @param n dimensione di ogni parte.
+	 */
 	public NBytes(File f, int n){
 		super(f);
 		dim_parti = n;
@@ -39,6 +46,23 @@ public class NBytes extends AbstractSplitter{
 		primo_carattere = "d"; //d per il primo file (che servirà per il merge) e un numero appartenente a [1,n_parti]
 	}
 
+	/**
+	 * Vengono creati un FileInputStream e un FileOutputStream, inizialmente null, e un buffer.
+	 * 
+	 * <p>Il fis è collegato a file, da cui dovremo infatti leggere.
+	 * <p>Poi un ciclicamente viene creato un nuovo file con lo schema: path + carattere + nome originale.
+	 * <p>Il primo carattere sarà 'd' o 'z' per il primo file creato, poi 1,2,3...,n_parti.
+	 * 
+	 * <p>Il nuovo file sarà riempito 
+	 * 	<p>- n_buffer_parti da un buffer da dimensione base (4096byte) e uno da dim_buffer_parti
+	 *  <p>- n_buffer_resto da un buffer di dimensione base (4096byte) e uno da dim_buffer_resto
+	 *  
+	 * <p>I nuovi file sono poi inseriti nell'array fileSplitted[].
+	 * Alla fine viene incrementata la barra di avanz.
+	 * 
+	 * <p>È aggiunta una stampa di "ho letto x bytes per nome_file" così da osservare come i thread siano concorrenti.
+	 */
+	
 	@Override
 	public void run() {
 		FileInputStream fis = null;
