@@ -20,7 +20,7 @@ public class Avanzamento extends JProgressBar{
 	 * L'inizializzazione della barra consiste nel mettere il valore iniziale a 0 e il valore massimo al numero di elementi.
 	 */
 	public void setInizio(){
-		setValue(0);
+		setVoid();
 		setMaximum(nElementi);
 	}
 	
@@ -30,5 +30,14 @@ public class Avanzamento extends JProgressBar{
 	public void incrementa(){
 		int v = getValue();
 		setValue(v+1);
+	}
+	
+	/**
+	 * La funzione svuota la progress bar.
+	 */
+	
+	public void setVoid(){
+		setValue(0);
+		this.repaint();
 	}
 }
