@@ -10,7 +10,6 @@ import java.io.IOException;
  */
 public class NBytes extends AbstractSplitter{
 	File[] fileSplitted;
-	Boolean zip;
 	
 	/**
 	 * Il costruttore richiama il costruttore padre, ossia di AbstractSplitter.
@@ -30,20 +29,7 @@ public class NBytes extends AbstractSplitter{
 			fileSplitted = new File[n_parti];
 		else
 			fileSplitted = new File[n_parti + 1];
-		zip = false;
-	}
-	
-	public void setDim(){
-		n_parti = dim/dim_parti;	//numero di file che saranno creati
-		dim_resto = dim%dim_parti;	//dimensione di un eventuale file resto
-		
-		n_buffer_parti = dim_parti/DIM_BUFFER;	//numero di buffer pieni per una singola parte
-		dim_buffer_parti = dim_parti%DIM_BUFFER;//dimensione di un eventuale buffer di resto per ogni parte
-		
-		n_buffer_resto = dim_resto/DIM_BUFFER;	//numero di buffer pieni per il file resto
-		dim_buffer_resto = dim_resto%DIM_BUFFER;//dimensione di un eventuale buffer di resto per il file resto
-				
-		primo_carattere = "d"; //d per il primo file (che servirà per il merge) e un numero appartenente a [1,n_parti]
+		setZip(false);
 	}
 
 	/**
@@ -52,11 +38,6 @@ public class NBytes extends AbstractSplitter{
 	 * <p>Il fis è collegato a file, da cui dovremo infatti leggere.
 	 * <p>Poi un ciclicamente viene creato un nuovo file con lo schema: path + carattere + nome originale.
 	 * <p>Il primo carattere sarà 'd' o 'z' per il primo file creato, poi 1,2,3...,n_parti.
-	 * 
-	 * <p>Il nuovo file sarà riempito 
-	 * 	<p>- n_buffer_parti da un buffer da dimensione base (4096byte) e uno da dim_buffer_parti
-	 *  <p>- n_buffer_resto da un buffer di dimensione base (4096byte) e uno da dim_buffer_resto
-	 *  
 	 * <p>I nuovi file sono poi inseriti nell'array fileSplitted[].
 	 * Alla fine viene incrementata la barra di avanz.
 	 * 
