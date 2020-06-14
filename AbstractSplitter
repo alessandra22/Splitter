@@ -6,7 +6,7 @@ import java.io.File;
  * Classe astratta padre di tutti i metodi di divisione.
  */
 public abstract class AbstractSplitter implements Runnable {
-	protected String path = "C:/Users/Lenovo/Desktop/Tutto/Università/Secondo Anno 19-20/Secondo Semestre/Calcolo Numerico/Appunti/PROVE/";
+	protected String path = "C:/Users/Lenovo/Desktop/Tutto/Università/Secondo Anno 19-20/Primo Semestre/Programmazione a Oggetti/Splitter/File Splittati/";
 	protected String primo_carattere;
 	protected File file;
 	protected String nome_file;
@@ -20,6 +20,7 @@ public abstract class AbstractSplitter implements Runnable {
 	protected int n_buffer_resto, dim_buffer_resto;
 	
 	protected Avanzamento avanz;
+	Boolean zip;
 	
 	/**
 	 * Il costruttore aggiorna i campi file e ne deriva il nome (nome_file) e prende la dimensione in byte (dim).
@@ -44,8 +45,17 @@ public abstract class AbstractSplitter implements Runnable {
 	 * <p>dim_buffer_resto = dimensione del buffer resto per la parte resto
 	 */
 	
-	void setDim(){
+	public void setDim(){
+		n_parti = dim/dim_parti;	//numero di file che saranno creati
+		dim_resto = dim%dim_parti;	//dimensione di un eventuale file resto
 		
+		n_buffer_parti = dim_parti/DIM_BUFFER;	//numero di buffer pieni per una singola parte
+		dim_buffer_parti = dim_parti%DIM_BUFFER;//dimensione di un eventuale buffer di resto per ogni parte
+		
+		n_buffer_resto = dim_resto/DIM_BUFFER;	//numero di buffer pieni per il file resto
+		dim_buffer_resto = dim_resto%DIM_BUFFER;//dimensione di un eventuale buffer di resto per il file resto
+				
+		primo_carattere = "d"; //d per il primo file (che servirà per il merge) e un numero appartenente a [1,n_parti]
 	}
 	
 	/**
@@ -55,5 +65,9 @@ public abstract class AbstractSplitter implements Runnable {
 	
 	public void setAvanz(Avanzamento a){
 		avanz = a;
+	}
+	
+	public void setZip(boolean z){
+		zip = z;
 	}
 }
