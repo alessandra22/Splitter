@@ -9,7 +9,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
@@ -27,18 +29,20 @@ import java.util.Vector;
  */
 @SuppressWarnings("serial")
 public class MyPanel extends JPanel implements ActionListener{
-	private String path = "C:/Users/Lenovo/Desktop/Tutto/Università/Secondo Anno 19-20/Secondo Semestre/Calcolo Numerico/Appunti/";
+	private String path = "C:/Users/Lenovo/Desktop/Tutto/Università/Secondo Anno 19-20/Primo Semestre/Programmazione a Oggetti/Splitter/";
 	private JTable table;
 	private JTextField t1, t2;
 	private JButton b, b1, b2, b3, b4;
-	private JRadioButton rb1, rb2, rb3;
-	private ButtonGroup bg1, bg2;
+	private JRadioButton rb1, rb2;
+	private JCheckBox cb;
+	private ButtonGroup bg1;
 	private Avanzamento progressBarTot;
 	private Coda c;
 	private Vector<String> colNames;
 	private Vector<Vector<Object>> data;
+	private JFrame frame;
 	
-	private String s= null;
+	private String s;
 	private char extra = 'd';
 	
 	DefaultTableModel MyModel;
@@ -65,8 +69,9 @@ public class MyPanel extends JPanel implements ActionListener{
 	 * <p>inserisce la JLabel label per la scritta "Inserisci modifiche:",
 	 * <p>inserisce le JTextfield t1 e t2, i campi per inserire i numeri rispettivamente per il n° di parti o la dim delle parti
 	 * <p>imposta i nomi delle colonne della JTable 
+	 * <p>inizializza la stringa s e il frame per i popup di errore.
 	 */
-	private void setText(){
+	public void setText(){
 		JLabel label = new JLabel("Inserisci modifiche:");
 		label.setBounds(490, 180, 180, 20);
 		add(label);
@@ -85,6 +90,9 @@ public class MyPanel extends JPanel implements ActionListener{
 		
 		colNames = new Vector<String>();
 		colNames.add("File"); colNames.add("Operazione"); colNames.add("Info");	colNames.add("Extra");
+		
+		s = "";
+		frame = new JFrame();
 	}
 	
 	/**
@@ -94,7 +102,7 @@ public class MyPanel extends JPanel implements ActionListener{
 	 * 
 	 * <p>Inoltre definisce lo JScrollPane, la modalità di selezione delle righe e la larghezza delle colonne.
 	 */
-	private void setTable(){
+	public void setTable(){
 		MyModel = new DefaultTableModel(data, colNames){
 			public boolean isCellEditable(int row, int column){
 				return false;
@@ -123,7 +131,7 @@ public class MyPanel extends JPanel implements ActionListener{
 	 * una delle due opzioni può essere selezionata.
 	 * <p>Inizialmente l'opzione di compressione non è abilitata. 
 	 */
-	private void setButtons(){
+	public void setButtons(){
 		b = new JButton("OK"); 			b.setBounds(620, 180, 80, 20); add(b);
 		b1 = new JButton("Aggiungi"); 	b1.setBounds(480, 441, 100, 30); add(b1);
 		b2 = new JButton("Elimina"); 	b2.setBounds(600, 441, 100, 30); add(b2);
@@ -131,19 +139,19 @@ public class MyPanel extends JPanel implements ActionListener{
 		b4 = new JButton("Avvia"); 		b4.setBounds(600, 482, 100, 30); add(b4);
 		
 		bg1 = new ButtonGroup();
-		bg2 = new ButtonGroup();
 		
 		rb1 = new JRadioButton("N° parti"); 	rb1.setBounds(490, 230, 80, 20); add(rb1);	
 		rb2 = new JRadioButton("N° bytes"); 	rb2.setBounds(490, 260, 80, 20); add(rb2);
-		rb3 = new JRadioButton("Compressione"); rb3.setBounds(490, 290, 150, 20); add(rb3);
+		cb = new JCheckBox("Compressione");		cb.setBounds(490, 290, 150, 20); add(cb);
 		
-		bg1.add(rb1); bg1.add(rb2); bg2.add(rb3);
+		bg1.add(rb1); bg1.add(rb2);
+		cb.setSelected(false);
 	}
 	
 	/**
 	 * La funzione setActions aggiunge i ActionListener e i relativi ActionCommand ai bottoni del panel
 	 */
-	private void setActions(){
+	public void setActions(){
 		b1.addActionListener(this); b1.setActionCommand("pb1");
 		b2.addActionListener(this); b2.setActionCommand("pb2");
 		b3.addActionListener(this); b3.setActionCommand("pb3");
@@ -152,14 +160,14 @@ public class MyPanel extends JPanel implements ActionListener{
 				
 		rb1.addActionListener(this); rb1.setActionCommand("prb1");
 		rb2.addActionListener(this); rb2.setActionCommand("prb2");
-		rb3.addActionListener(this); rb3.setActionCommand("prb3");
+		cb.addActionListener(this);  cb.setActionCommand("pcb");
 	}
 	
 	/**
 	 * La funzione setProgressBar inizializza un oggetto di tipo Avanzamento, passandogli la dimensione della coda, ossia del
 	 * numero di elementi su cui lavorare, ne stabilisce le dimensione e la aggiunge al Panel
 	 */
-	private void setProgressBar(){		
+	public void setProgressBar(){		
 		progressBarTot = new Avanzamento(c.getSize());
 		progressBarTot.setBounds(470, 120, 250, 25);
 		add(progressBarTot);
@@ -168,29 +176,31 @@ public class MyPanel extends JPanel implements ActionListener{
 	
 	/**
 	 * La funzione setVisibleText serve ad abilitare le TextArea delle funzioni selezionate e cancella il testo di quella 
-	 * non attiva
+	 * non attiva. 
 	 * 
 	 * @param a booleano per decidere se abilitare o meno la TextArea t1
 	 * @param b booleano per decidere se abilitare o meno la TextArea t2
-	 * @param c booleano per decidere se cancellaro o meno il testo della TextArea t1
+	 * @param c booleano per decidere se cancellare o meno il testo della TextArea t1
+	 * @param d booleano per decidere se cancellare o meno il testo della TextArea t2
 	 */
-	private void setVisibleText(Boolean a, Boolean b, Boolean c, Boolean d){
+	public void setVisibleText(Boolean a, Boolean b, Boolean c, Boolean d){
 		t1.setEditable(a);
 		t2.setEditable(b);
 		if (!c)
 			t1.setText(null);
+		
 		if (!d)
 			t2.setText(null);
 	}
 	
 	/**
-	 * La funzione setCZEnabled rende attivi o meno il bottone di compressione. È chiamata ogni volta che viene
+	 * La funzione setZipEnabled rende attivo o meno il bottone di compressione. È chiamata ogni volta che viene
 	 * scelta una funzione tra divisione in parti e in bytes.
 	 * 
-	 * @param b booleano vero se sono selezionabili (divisione in bytes), falso altrimenti (divisione per parti)
+	 * @param b booleano vero se lo zip è selezionabile (divisione in bytes), falso altrimenti (divisione per parti)
 	 */
-	private void setCZEnabled(Boolean b){
-		rb3.setEnabled(b);
+	public void setZipEnabled(Boolean b){
+		cb.setEnabled(b);
 	}
 	
 	/**
@@ -199,7 +209,7 @@ public class MyPanel extends JPanel implements ActionListener{
 	 * Se non sono stati selezionati, svuota l'array di File fs.
 	 */
 	@SuppressWarnings("static-access")
-	  private void fileChooser(){
+	public void fileChooser(){
 	    fc = new JFileChooser(path);
 	    fc.setMultiSelectionEnabled(true);
 	   
@@ -215,27 +225,27 @@ public class MyPanel extends JPanel implements ActionListener{
 	/**
 	 * La funzione actionPerformed decide l'azione da svolgere a seconda del bottone che è stato premuto:
 	 * 
-	 * <p><p>pb1 = bottone "aggiungi"
+	 * <p>pb1 = bottone "aggiungi"
 	 * 	<p>Viene invocata la funzione fileChooser e creato un vettore di oggetti. In un ciclo for il vettore viene inizializzato
 	 *  e gli vengono aggiunti il nome del file e gli altri campi sono aggiunti come default (null, null, 'd').
 	 *  Questi vengono poi aggiunti al vettore data della tabella.
 	 *  Poi viene usato il Listener del MyModel della modifica dei file e viene aggiornata la tabella.
 	 *  
-	 * <p><p>pb2 = bottone "elimina"
+	 * <p>pb2 = bottone "elimina"
 	 *  <p>Viene inizializzata una variabile intera i col valore della riga selezionata (getRowSelected()). 
 	 *  Se il valore di i è valido (diverso da -1) viene eliminato sia nella coda che nel vettore data della tabella e si può
 	 *  "avvertire" la tabella che i suoi dati sono stati modificati con il Listener del MyModel e aggiornarla. 
 	 *  Altrimenti compare un popup che avverte che nessuna riga è selezionata. 
 	 *  
-	 * <p><p>pb3 = bottone "merge"
+	 * <p>pb3 = bottone "merge"
 	 * 	<p>Viene invocato il fileChooser e va selezionato il primo file generato (prima lettera 'd' o 'z'). Viene poi creato un 
 	 *  oggetto di tipo Merger, che ha come parametro il file preso dal fileChooser. 
 	 *  
-	 * <p><p>pb4 = bottone "start"
+	 * <p>pb4 = bottone "start"
 	 * 	<p>Se la coda non è vuota, viene creato un oggetto di tipo Splitter e si invoca la sua funzione per far avviare 
 	 *  la divisione. Altrimenti compare un popup che avverte che la coda è vuota. 
 	 *  
-	 * <p><p>pok = bottone "ok"
+	 * <p>pok = bottone "ok"
 	 *  <p>Viene creata una variabile j che prende il valore di getRowSelected. Se è valida (ossia diversa da -1) e il valore
 	 *  stringa è stato deciso (ossia è premuto uno dei bottoni principali "divisione per parti" o "divisione per bytes"), 
 	 *  a seconda del valore di questa viene salvato in una variabile intera n il valore numerioc della corrispondente JTextArea. 
@@ -249,16 +259,16 @@ public class MyPanel extends JPanel implements ActionListener{
 	 *  con la funzione setVisibleArea(), tutti i pulsanti radio deselezionati, quello di compressione disabilitato e 
 	 *  il valore extra reimpostato a default. 
 	 *  
-	 * <p><p>prb1 = bottone radio "divisione per parti"
-	 *  La stringa s è modificata in "#parti", la JTextArea t1 e abilitata alla modifica, la t2 no e il suo testo viene eliminato.
+	 * <p>prb1 = bottone radio "divisione per parti"
+	 *  <p>La stringa s è modificata in "#parti", la JTextArea t1 e abilitata alla modifica, la t2 no e il suo testo viene eliminato.
 	 *  I bottoni di crittografia e compressione sono disabilitati.
 	 *  
-	 * <p><p>prb2 = bottone radio "divisione per bytes"
-	 *  La stringa s è modificata in "#bytes", la JTextArea t2 e abilitata alla modifica, la t1 no e il suo testo viene eliminato.
+	 * <p>prb2 = bottone radio "divisione per bytes"
+	 *  <p>La stringa s è modificata in "#bytes", la JTextArea t2 e abilitata alla modifica, la t1 no e il suo testo viene eliminato.
 	 *  I bottoni di crittografia e compressione sono abilitati.
 	 *
-	 * <p><p>prb3 = bottone radio "compressione"
-	 *  Il carattere extra è modificato in 'z'
+	 * <p>pcb = checkbox "compressione"
+	 *  <p>Il carattere extra è modificato in 'z' se la JCheckBox relativa è selezionata
 	 */
 	@SuppressWarnings("static-access")
 	@Override
@@ -272,7 +282,7 @@ public class MyPanel extends JPanel implements ActionListener{
 					v.add(fs[i].getName());
 					v.add(null);
 					v.add(null);
-					v.add(extra);
+					v.add('d');
 					data.add(v);
 				}
 				MyModel.fireTableDataChanged();
@@ -282,7 +292,7 @@ public class MyPanel extends JPanel implements ActionListener{
 			case "pb2": 
 				int i = table.getSelectedRow();
 				if(i==-1) 
-					JOptionPane.showInputDialog("NESSUNA RIGA SELEZIONATA");
+					JOptionPane.showMessageDialog(frame, "Nessuna riga selezionata!", "Attenzione!", JOptionPane.WARNING_MESSAGE);
 				else{
 					System.out.println(c.getNameFile(i) + " eliminato!");
 					c.deleteIndex(i);
@@ -293,7 +303,7 @@ public class MyPanel extends JPanel implements ActionListener{
 				break;
 				
 			case "pb3": 
-				fc = new JFileChooser(path);
+				fc = new JFileChooser(path + "File Splittati/");
 				int fileSelezionato = fc.showOpenDialog(MyPanel.this); 
 			    if (fileSelezionato==fc.APPROVE_OPTION){              
 			    	Merger m = new Merger (fc.getSelectedFile());
@@ -303,65 +313,87 @@ public class MyPanel extends JPanel implements ActionListener{
 				
 				
 			case "pb4": 
-				if(c!=null){
+				if(c.getSize() != 0){
+					if (progressBarTot!=null)
+						remove(progressBarTot);
 					setProgressBar();
-					Splitter splitter = new Splitter(c, progressBarTot);
-					splitter.start();
+					boolean flag = true;
+					for (int k=0; k<c.getSize(); k++){
+						if (c.getOpIndex(k) == null){
+							flag = false;
+							JOptionPane.showMessageDialog(frame, c.getNameFile(k) + " ha i dati incompleti!", "Attenzione!", JOptionPane.WARNING_MESSAGE);
+						}
+					}
+					
+					if (flag){
+						Splitter splitter = new Splitter(c, progressBarTot);
+						splitter.start();
+					}
 				}
 				else
-					JOptionPane.showInputDialog("CODA VUOTA");
+					JOptionPane.showMessageDialog(frame, "Coda vuota!", "Attenzione!", JOptionPane.WARNING_MESSAGE);
 				break;
 				
 			case "pok":
 				int j = table.getSelectedRow();
 				if (j!=-1){
-					int n = 0;
 					if(s == "")
-						JOptionPane.showInputDialog("DATI INCOMPLETI");
+						JOptionPane.showMessageDialog(frame, "Seleziona un'opzione!", "Attenzione!", JOptionPane.WARNING_MESSAGE);
 					
 					else {
-						if(s == "#parti")
-							n = Integer.parseInt(t1.getText());
-						if(s == "#bytes")
-							n = Integer.parseInt(t2.getText());
-						c.setElementoIndex(j, c.getFileIndex(j), s, n, extra);
-						Vector <Object> d = new Vector <Object>();
-						d.add(c.getNameFile(j));d.add(c.getOpIndex(j));
-						d.add(c.getInfoIndex(j));d.add(c.getExtraIndex(j));
-						data.set(j, d);
-						MyModel.fireTableDataChanged();
-						table.revalidate();
+						try{
+							int n;
+							if(s == "#parti")
+								n = Integer.parseInt(t1.getText());
+							else
+								n = Integer.parseInt(t2.getText());
+							c.setElementoIndex(j, c.getFileIndex(j), s, n, extra);
+							Vector <Object> d = new Vector <Object>();
+							d.add(c.getNameFile(j));d.add(c.getOpIndex(j));
+							d.add(c.getInfoIndex(j));d.add(c.getExtraIndex(j));
+							data.set(j, d);
+							MyModel.fireTableDataChanged();
+							table.revalidate();
 						
-						bg1.clearSelection(); bg2.clearSelection();
-						extra = 'd';
-						setVisibleText(false,false,false,false);
-						setCZEnabled(false);
+							s = "";
+							bg1.clearSelection();
+							cb.setSelected(false);
+							extra = 'd';
+							setVisibleText(false,false,false,false);
+							setZipEnabled(false);
+						} catch(NumberFormatException ex){
+							JOptionPane.showMessageDialog(frame, "Formato testo errato!", "Attenzione!", JOptionPane.WARNING_MESSAGE);
+						}
 					}
 				}
 				else
-					JOptionPane.showInputDialog("FILE NON SELEZIONATO");
+					JOptionPane.showMessageDialog(frame, "Riga non selezionata!", "Attenzione!", JOptionPane.WARNING_MESSAGE);
 				break;
 			
 			case "prb1":
 				s = "#parti";
 				setVisibleText(true,false,true,false);
-				setCZEnabled(false);
+				setZipEnabled(false);
 				break;
 				
 			case "prb2":
-				setVisibleText(false,true,false,true);
-				setCZEnabled(true);
 				s = "#bytes";
+				setVisibleText(false,true,false,true);
+				setZipEnabled(true);
 				break;
 				
-			case "prb3":
-				extra = 'z';
+			case "pcb":
+				if(cb.isSelected())
+					extra = 'z';
+				if(!cb.isSelected())
+					extra = 'd';
 				break;
 		}	
 	}
 	
 	/**
 	 * La funzione main crea un oggetto MyFrame, a cui viene aggiunto il MyPanel, e lo rende visibile.
+	 * @param args vuoti
 	 */
 	public static void main(String[] args) {
 		MyFrame f = new MyFrame("Progetto 2019/20 OOP");
