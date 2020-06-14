@@ -25,7 +25,7 @@ public class Zip extends NBytes{
 	public Zip(File f, int n){
 		super(f, n);
 		primo_carattere = "z";
-		zip = true;
+		setZip(true);
 	}
 	
 	/**
